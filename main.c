@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <ctype.h>
+#include <math.h>
 
 // Convert string to num
 int toNum(char const* arr, int len) {
@@ -42,6 +43,31 @@ void insertMaximum3Heap(int* heap, int const* nodes, int pos) {
 }
 
 
+// Display the heap
+void displayHeap(int* heap, int len, int type) {
+    // Get heap height
+    int level = 1, nodes = 1, now_layer_nodes = 1;
+    while(len > nodes) {
+        level++;
+        now_layer_nodes *= type;
+        nodes += now_layer_nodes;
+    }
+
+    // Print out the heap with level order
+    int node_index = 2;
+    printf("%d\n", heap[1]);
+    for(int i = 1;i < level;i++) {
+        for(int j = 0;j < pow(type, i);j++) {
+            if(heap[node_index]){
+                printf("%d ", heap[node_index]);
+                node_index++;
+            }
+        }
+        printf("\n");
+    }
+}
+
+
 int main() {
     // Input variables
     char c;
@@ -72,12 +98,11 @@ int main() {
 
     // Heap
     int heap[10000] = {};
-
     // Heap type
     int type;
     printf("Entering heap type - 1)Max-Heap 2)Min-Heap 3)Maximum 3-Heap : ");
     type = getchar();
-
+    // Generating heap
     switch(type) {
         case '1':
             for(int i = 1;i < index;i++) insertMaxHeap(heap, nodes, i);
@@ -92,11 +117,10 @@ int main() {
             break;
     }
 
-    for(int i = 1;i < index;i++) printf("%d ", heap[i]);
-    printf("\n");
+    // Display the whole heap
+    displayHeap(heap, index-1, type=='3' ? 3 : 2);
 
     return 0;
 }
-
 
 /* Data : 16 5 8 10 12 1 14 15 3 11 9 7 4 13 2 */
