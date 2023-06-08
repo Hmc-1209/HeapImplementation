@@ -130,7 +130,7 @@ void deleteOneMaximum3(int *heap, int* index) {
     int pos = 1;
     int last = heap[*index-1];
     while(pos*3-1 < *index) {
-        int move_pos = findMax(heap[pos*3-1], heap[pos*3], heap[pos*3+1]);16 5 8 10 12 1 14 15 3 11 9 7 4 13 216 5 8 10 12 1 14 15 3 11 9 7 4 13 2
+        int move_pos = findMax(heap[pos*3-1], heap[pos*3], heap[pos*3+1]);
         if(heap[pos*3+move_pos] > last) heap[pos] = heap[pos*3+move_pos];
         else break;
         pos = pos * 3 + move_pos;
