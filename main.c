@@ -69,8 +69,19 @@ void displayHeap(int* heap, int len, int type) {
 
 
 // Toggle between min heap and max heap, using the current state
-void toggleMinMax(int* heap, int* nodes, int index, int* type) {
-    // Not finished
+void toggleMinMax(int* heap, int* nodes,int index,int *type){
+    switch(*type) {
+        case '1':
+            for(int i = 1;i < index;i++) nodes[i] = heap[i];
+            for(int i = 1;i < index;i++) insertMinHeap(heap, nodes, i);
+            *type = '2';
+            break;
+        default:
+            for(int i = 1;i < index;i++) nodes[i] = heap[i];
+            for(int i = 1;i < index;i++) insertMaxHeap(heap, nodes, i);
+            *type = '1';
+            break;
+    }
 }
 
 
