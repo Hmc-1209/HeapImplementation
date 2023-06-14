@@ -43,6 +43,17 @@ void insertMaximum3Heap(int* heap, int const* nodes, int pos) {
 }
 
 
+// Inserting a number in a minimum 3-heap
+void insertMinimum3Heap(int* heap, int const* nodes, int pos) {
+    int switch_pos = pos;
+    while((switch_pos != 1) && (nodes[pos] < heap[(switch_pos+1)/3])){
+        heap[switch_pos] = heap[(switch_pos+1)/3];
+        switch_pos = (switch_pos+1) / 3;
+    }
+    heap[switch_pos] = nodes[pos];
+}
+
+
 // Display the heap
 void displayHeap(int* heap, int len, int type) {
     // Get heap height
@@ -84,6 +95,21 @@ void toggleMinMax(int* heap, int* nodes, int index, int* type) {
     }
 }
 
+// Toggle between min heap and max heap, using the current state
+void toggleMinMax3(int* heap, int* nodes, int index, int* type) {
+    switch(*type) {
+        case '3':
+            for(int i = 1;i < index;i++) nodes[i] = heap[i];
+            for(int i = 1;i < index;i++) insertMinimum3Heap(heap, nodes, i);
+            *type = '4';
+            break;
+        default:
+            for(int i = 1;i < index;i++) nodes[i] = heap[i];
+            for(int i = 1;i < index;i++) insertMaximum3Heap(heap, nodes, i);
+            *type = '3';
+            break;
+    }
+}
 
 // Delete the extreme value in min/max heap
 void deleteOneMinMax(int* heap, int* index, int const* type) {
@@ -123,20 +149,34 @@ int findMax(int a, int b, int c) {
     else if(b>=a && b>=c) return 0;
     else return 1;
 }
+// Find the minimum child node in a parent node in minimum 3-heap;
+int findMin(int a, int b, int c) {
+    if(a<=b && a<=c) return -1;
+    else if(b<=a && b<=c) return 0;
+    else return 1;
+}
 
 
 // Delete the maximum node in maximum 3-heap
-void deleteOneMaximum3(int *heap, int* index) {
+void deleteOneMinMax3(int *heap, int* index, int const* type) {
     int pos = 1;
     int last = heap[*index-1];
-    while(pos*3-1 < *index) {
-        int move_pos = findMax(heap[pos*3-1], heap[pos*3], heap[pos*3+1]);
-        if(heap[pos*3+move_pos] > last) heap[pos] = heap[pos*3+move_pos];
-        else break;
-        pos = pos * 3 + move_pos;
+    while(pos*3+2 < *index) {
+        if(*type == '3') {
+            int move_pos = findMax(heap[pos*3-1], heap[pos*3], heap[pos*3+1]);
+            if(heap[pos*3+move_pos] > last) heap[pos] = heap[pos*3+move_pos];
+            else break;
+            pos = pos * 3 + move_pos;
+        } else {
+            int move_pos = findMin(heap[pos*3-1], heap[pos*3], heap[pos*3+1]);
+            if(heap[pos*3+move_pos] < last) heap[pos] = heap[pos*3+move_pos];
+            else break;
+            pos = pos * 3 + move_pos;
+        }
     }
     heap[pos] = last;
     *index -= 1;
+//    for(int i=1;i<*index+10;i++) printf("%d:", heap[i]);
 }
 
 
@@ -172,7 +212,7 @@ int main() {
     int heap[10000] = {};
     // Heap type
     int type;
-    printf("Entering heap type - [1]Max-Heap  [2]Min-Heap  [3]Maximum 3-Heap : ");
+    printf("Entering heap type - [1]Max-Heap  [2]Min-Heap  [3]Maximum 3-Heap [4]Minimum 3-Heap: ");
     type = getchar();
     getchar();
     // Generating heap
@@ -186,19 +226,22 @@ int main() {
         case '3':
             for(int i = 1;i < index;i++) insertMaximum3Heap(heap, nodes, i);
             break;
+        case '4':
+            for(int i = 1;i < index;i++) insertMinimum3Heap(heap, nodes, i);
+            break;
         default:
             break;
     }
 
     // Display the whole heap
     printf("Current heap : \n");
-    displayHeap(heap, index-1, type=='3' ? 3 : 2);
+    displayHeap(heap, index-1, type=='3'||type=='4' ? 3 : 2);
     printf("\n");
 
     // Keep tracking user behaviors
     int behavior;
     // If it is min heap / max heap
-    if(type != '3'){
+    if(type == '1' || type == '2'){
         while(1) {
             printf("Enter behavior - [1]Toggle to min/max  [2]delete one node(min/max)  [3]exit:");
             behavior = getchar();
@@ -212,15 +255,17 @@ int main() {
             displayHeap(heap, index-1, 2);
             printf("\n");
         }
-    // If it is maximum 3-heap
+    // If it is maximum / minimum 3-heap
     } else {
         while(1) {
-          printf("Enter behavior - [1]Delete one node(max)  [2]exit:");
+          printf("Enter behavior - [1]Toggle to min/max  [2]delete one node(min/max)  [3]exit:");
           behavior = getchar();
           getchar();
           // Toggle through min heap and max heap
-          if (behavior == '1') deleteOneMaximum3(heap, &index);
-              // Exit all
+          if (behavior == '1') toggleMinMax3(heap, nodes, index, &type);
+          // Delete the biggest/smallest node in max/min heap
+          else if(behavior == '2') deleteOneMinMax3(heap, &index, &type);
+          // Exit all
           else break;
           displayHeap(heap, index-1, 3);
           printf("\n");
