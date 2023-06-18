@@ -1,15 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
-#include <math.h>
 #include <time.h>
-
-// Convert string to num
-int toNum(char const* arr, int len) {
-    int num = 0;
-    for(int i = 0;i < len;i++) num = num * 10 + ((int)arr[i] - 48);
-    return num;
-}
-
 
 // Inserting a number in max heap
 void insertMaxHeap(int* heap, int const* nodes, int pos) {
@@ -30,31 +22,6 @@ void insertMaximum3Heap(int* heap, int const* nodes, int pos) {
         switch_pos = (switch_pos+1) / 3;
     }
     heap[switch_pos] = nodes[pos];
-}
-
-
-// Display the heap
-void displayHeap(int* heap, int len, int type) {
-    // Get heap height
-    int level = 1, nodes = 1, now_layer_nodes = 1;
-    while(len > nodes) {
-        level++;
-        now_layer_nodes *= type;
-        nodes += now_layer_nodes;
-    }
-
-    // Print out the heap with level order
-    int node_index = 2;
-    printf("%d\n", heap[1]);
-    for(int i = 1;i < level;i++) {
-        for(int j = 0;j < pow(type, i);j++) {
-            if(heap[node_index] && node_index <= len){
-                printf("%d ", heap[node_index]);
-                node_index++;
-            }
-        }
-        printf("\n");
-    }
 }
 
 
@@ -87,7 +54,7 @@ int findMax(int a, int b, int c) {
 }
 
 
-// Delete the maximum node in maximum 3-heap
+// Sort the maximum node in maximum 3-heap
 void sortOne_3(int *heap, int* index) {
     int pos = 1;
     int last = heap[*index-1], first = heap[1];
@@ -105,80 +72,70 @@ void sortOne_3(int *heap, int* index) {
 
 
 int main() {
-    // Input variables
-    char c;
-    char arr[10000] = {};
-    int length = 0;
-    // Data variables
-    int nodes[10000] = {};
+    srand(time(NULL));
+    int nodes[10001] = {};
     int index = 1;
-    // While input not end
-    while(1) {
-        scanf("%c", &c);
-        if (c == ' ' && length != 0) {
-            nodes[index] = toNum(arr, length);
-            index++;
-            length = 0;
-        } else if (isdigit(c)) {
-            arr[length] = c;
-            length++;
-        }
-        if (c == '\n') {
-            if (length != 0) {
-                nodes[index] = toNum(arr, length);
-                index++;
+    for(int i=1;i<10001;i++) {
+        int num = rand()%10001, repeat = 0;
+        if(num == 0) repeat = 1;
+        for(int j=1;j<i;j++) {
+            if(num == nodes[j]) {
+                repeat = 1;
+                break;
             }
-            break;
+        }
+        if(!repeat) {
+            nodes[index] = num;
+            index++;
+        } else {
+            i--;
         }
     }
     int index_p = index;
 
+//    printf("Nodes generated : ");
+//    for(int i=1;i<index;i++) printf("%d ", nodes[i]);
+
     // Heap
-    int heap[10000] = {};
+    int heap[10001] = {};
     // Heap type
     int type;
-    printf("Entering heap type - [1]Max-Heap  [2]Minimum 3-Heap: ");
+    printf("Entering heap type - [1]Max-Heap  [2]Maximum 3-Heap: ");
     type = getchar();
     getchar();
 
     // Generating heap
     switch(type) {
         case '1':
-            for(int i = 1;i < index;i++) {
+            for(int i = 1;i <= index_p;i++) {
                 insertMaxHeap(heap, nodes, i);
             }
             break;
         case '2':
-            for(int i = 1;i < index;i++) {
+            for(int i = 1;i <= index_p;i++) {
                 insertMaximum3Heap(heap, nodes, i);
             }
         default:
             break;
     }
 
-    //Display the whole heap
-//    printf("Current heap : \n");
-//    displayHeap(heap, index-1, type=='3'||type=='4' ? 3 : 2);
-//    printf("\n");
-
     unsigned long int start_time, end_time;
 
     // Sort the whole heap
     if(type == '1') {
         start_time = clock();
-        for(int i=0;i<=index_p;i++) sortOne(heap, &index);
+        for(int i=0;i<index_p;i++) sortOne(heap, &index);
         end_time = clock();
     } else {
         start_time = clock();
-
-        for(int i=0;i<=index_p;i++) sortOne_3(heap, &index);
+        for(int i=0;i<index_p;i++) sortOne_3(heap, &index);
         end_time = clock();
     }
 
     printf("Sorting spent time : %f\n", (double)(end_time-start_time) / CLOCKS_PER_SEC);
 
-    printf("After sorting : ");
-    for(int i=1;i<=index_p;i++) printf("%d ", heap[i]);
+//    printf("After sorting : ");
+//    for(int i=1;i<=index_p;i++) printf("%d ", heap[i]);
 
     return 0;
 }
