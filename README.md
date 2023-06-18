@@ -1,3 +1,3 @@
 # Heap Implementation
 
-Using clock to determine the sorting time.
+Using time to determine the sorting time.
